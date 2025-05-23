@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +26,7 @@ SECRET_KEY = 'django-insecure-2*fn(3hz3!_ln=outnr&4_5yf5!7)8o)ycua7g@ec-hox6q@ai
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cs-webapps.bu.edu']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'cs-webapps.bu.edu']
 
 
 # Application definition
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "hw", # new app for pre class 1
+    'quotes', # new app for assignment 1
 ]
 
 MIDDLEWARE = [
@@ -120,12 +123,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-import os
-
+STATIC_URL = 'static/' # note: no leading slash
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = 'static/' # note: no leading slash!
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
@@ -133,9 +132,12 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 MEDIA_URL= "media/"  # note: no leading slash!
 
+
+
 import socket
 CS_DEPLOYMENT_HOSTNAME = 'cs-webapps.bu.edu'
 
 if socket.gethostname() == CS_DEPLOYMENT_HOSTNAME:
     STATIC_URL = '/username/static/'
     MEDIA_URL = '/username/media/'
+    
