@@ -6,4 +6,5 @@ urlpatterns = [
     path('quote/', views.quote, name='quote'),        # /quote
     path('show_all/', views.show_all, name='show_all'),
     path('about/', views.about, name='about'),
+    
 ]

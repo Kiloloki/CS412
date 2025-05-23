@@ -20,6 +20,10 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("hw/", include("hw.urls")),
-    path('', include('quotes.urls')),  # 👈 加这一行，包含 quotes app 的路由
+    path('', include('quotes.urls')), 
+    path("admin/", admin.site.urls),
+    path("hw/", include("hw.urls")),
+    path("formdata/", include("formdata.urls")),
+    path('restaurant/', include('restaurant.urls')),
     
 ]

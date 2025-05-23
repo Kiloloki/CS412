@@ -1,0 +1,16 @@
+{% extends 'restaurant/base.html' %}
+{% block content %}
+<h2>Place Your Order</h2>
+<form method= "post" >
+    {% csrf_token %}
+    {% for item, price in menu.items %}
+        <label><input type="checkbox" name="{{ item }}"> {{ item }} (${{ price }})</label><br>
+    {% endfor %}
+    <p><strong>Daily Special:</strong> {{ daily_special }}</p>
+    <p>Special Instructions:<br><textarea name="instructions"></textarea></p>
+    <p>Name: <input type="text" name="name"></p>
+    <p>Phone: <input type="text" name="phone"></p>
+    <p>Email: <input type="email" name="email"></p>
+    <button type="submit" formaction="{% url 'confirmation' %}">Submit</button>
+</form>
+{% endblock %}

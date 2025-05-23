@@ -1,0 +1,15 @@
+{% extends 'restaurant/base.html' %} {% load static %} {% block content %}
+
+<h2>About Us</h2>
+<p>Location: Boston University</p>
+<p>Hours: Mon-Sun 11am - 9pm</p>
+<ul>
+  <li>Great ambiance</li>
+  <li>Online ordering available</li>
+</ul>
+<img
+  src="{% static 'restaurant/food.jpg' %}"
+  alt="restaurant photo"
+  width="400"
+/>
+{% endblock %}
