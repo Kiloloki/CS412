@@ -1,4 +1,7 @@
-/* Base styles */
+/*  File: restaurant_style.css
+ Author: Bella WANG (bella918@bu.edu), 5/23/2025
+ Description: web css file for restaurant assignment */
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f0f6fc;
@@ -7,7 +10,6 @@ body {
   padding: 0;
 }
 
-/* Header and navigation */
 header {
   background-color: #0077cc;
   color: white;
@@ -59,6 +61,7 @@ form {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
 }
 
+/* form label */
 form label {
   display: block;
   margin: 10px 0 5px;
@@ -89,7 +92,6 @@ form button:hover {
   background-color: #005fa3;
 }
 
-/* Confirmation */
 .confirmation {
   background-color: #e6f2ff;
   padding: 20px;
@@ -97,7 +99,6 @@ form button:hover {
   margin-top: 20px;
 }
 
-/* Images */
 img {
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
@@ -109,4 +110,12 @@ footer {
   font-size: 0.9em;
   color: #888;
   margin-top: 40px;
+}
+
+/* center the image */
+.centered-img {
+  display: block;
+  margin: 20px auto;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }

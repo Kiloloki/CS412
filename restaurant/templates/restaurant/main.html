@@ -1,15 +1,25 @@
+<!-- 
+  File: main.html
+  Author: Bella WANG (bella918@bu.edu)
+  Date: 2025-05-23
+  Description: Main page for the restaurant app. 
+               Displays basic information including location, hours, 
+               highlights, and an image of the restaurant's offering.
+-->
 {% extends 'restaurant/base.html' %} {% load static %} {% block content %}
 
 <h2>About Us</h2>
-<p>Location: Boston University</p>
+<p>Location: 701 Commonwealth Avenue, Boston University</p>
 <p>Hours: Mon-Sun 11am - 9pm</p>
 <ul>
   <li>Great ambiance</li>
+  <li>Offer free WIFI</li>
   <li>Online ordering available</li>
 </ul>
 <img
-  src="{% static 'restaurant/food.jpg' %}"
+  class="centered-img"
+  src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Baby_back_ribs_with_fries.jpg"
   alt="restaurant photo"
-  width="400"
+  width="500"
 />
 {% endblock %}

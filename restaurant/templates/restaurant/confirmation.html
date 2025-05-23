@@ -1,10 +1,14 @@
-{% extends 'restaurant/base.html' %}
-{% block content %}
+<!-- File: comfirmation.html
+ Author: Bella WANG (bella918@bu.edu), 5/23/2025
+ Description: web comfirmation html file for restaurant assignment, including the order information and person information*-->
+
+{% extends 'restaurant/base.html' %} {% block content %}
 <h2>Order Confirmation</h2>
 <p>Thank you, {{ name }}!</p>
 <p>Order for: {{ items|join:", " }}</p>
 <p>Total: ${{ total }}</p>
 <p>Ready by: {{ ready_time }}</p>
 <p>Instructions: {{ instructions }}</p>
-<p>We’ll contact you at {{ phone }} / {{ email }}</p>
+<p>We will contact you at {{ phone }} / {{ email }}</p>
+<p>Enjoy your meal and have a nice day!</p>
 {% endblock %}

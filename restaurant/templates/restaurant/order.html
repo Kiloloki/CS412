@@ -1,16 +1,37 @@
-{% extends 'restaurant/base.html' %}
-{% block content %}
+<!-- File: order.html
+ Author: Bella WANG (bella918@bu.edu), 5/23/2025
+ Description: web order html file for restaurant assignment, including the menu information and person information*-->
+{% extends 'restaurant/base.html' %} {% block content %}
 <h2>Place Your Order</h2>
-<form method= "post" >
-    {% csrf_token %}
-    {% for item, price in menu.items %}
-        <label><input type="checkbox" name="{{ item }}"> {{ item }} (${{ price }})</label><br>
-    {% endfor %}
-    <p><strong>Daily Special:</strong> {{ daily_special }}</p>
-    <p>Special Instructions:<br><textarea name="instructions"></textarea></p>
-    <p>Name: <input type="text" name="name"></p>
-    <p>Phone: <input type="text" name="phone"></p>
-    <p>Email: <input type="email" name="email"></p>
-    <button type="submit" formaction="{% url 'confirmation' %}">Submit</button>
+<form method="post">
+  {% csrf_token %} {% for item, price in menu.items %}
+  <label>
+    <input type="checkbox" name="{{ item }}" />
+    {{ item }} ${{ price }} </label
+  ><br />
+  {% endfor %}
+  <p>
+    <label>
+      <input type="checkbox" name="daily_special" value="on" />
+      <strong>Daily Special:</strong> {{ daily_special_name }}
+      ${{daily_special_price }}
+    </label>
+  </p>
+  <input
+    type="hidden"
+    name="daily_special_name"
+    value="{{ daily_special_name }}"
+  />
+  <input
+    type="hidden"
+    name="daily_special_price"
+    value="{{ daily_special_price }}"
+  />
+
+  <p>Special Instructions:<br /><textarea name="instructions"></textarea></p>
+  <p>Name: <input type="text" name="name" /></p>
+  <p>Phone: <input type="text" name="phone" /></p>
+  <p>Email: <input type="email" name="email" /></p>
+  <button type="submit" formaction="{% url 'confirmation' %}">Submit</button>
 </form>
 {% endblock %}
