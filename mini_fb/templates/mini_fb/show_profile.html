@@ -1,0 +1,11 @@
+{% extends 'mini_fb/base.html' %}
+{% block content %}
+<nav><a href="{% url 'show_all_profiles' %}">Back to all profiles</a></nav>
+<h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
+<img src="{{ profile.image_url }}" width="300">
+<ul>
+    <li><strong>City:</strong> {{ profile.city }}</li>
+    <li><strong>Email:</strong> {{ profile.email }}</li>
+</ul>
+<a href="{% url 'show_all_profiles' %}">Back to all profiles</a>
+{% endblock %}

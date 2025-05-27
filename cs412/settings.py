@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'quotes', # new app for assignment 1
     "formdata", # new app for pre class 2
     "restaurant", # new app for assignment 2
+    "blog", # new app for pre class 3
+    "mini_fb", # new app for assignment 3
 ]
 
 MIDDLEWARE = [
