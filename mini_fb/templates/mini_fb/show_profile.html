@@ -1,3 +1,7 @@
+<!-- File: show_profile.html
+ Author: Bella WANG (bella918@bu.edu), 5/27/2025
+ Description: web show_profile html file for mini_fb assignment. generate information about one person in the profile *-->
+
 {% extends 'mini_fb/base.html' %} {% block content %}
 <nav><a href="{% url 'show_all_profiles' %}">Back to all profiles</a></nav>
 <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
