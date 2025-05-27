@@ -5,24 +5,26 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Quotes App</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'quote_style.css' %}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'quote_style.css' %}"
+    />
+  </head>
+  <body>
     <header>
-        <h1>Quotes from Albert Einstein</h1>
-        <nav>
-            <a href="{% url 'quote' %}">Home</a> |
-            <a href="{% url 'show_all' %}">Show All</a> |
-            <a href="{% url 'about' %}">About</a>
-        </nav>
+      <h1>Quotes from Albert Einstein</h1>
+      <nav>
+        <a href="{% url 'quote' %}">Home</a> |
+        <a href="{% url 'show_all' %}">Show All</a> |
+        <a href="{% url 'about' %}">About</a>
+      </nav>
     </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+    <main>{% block content %}{% endblock %}</main>
     <footer>
-        <p>Page created by bella918@bu.edu</p>
+      <p>Page created by bella918@bu.edu</p>
     </footer>
-</body>
+  </body>
 </html>
