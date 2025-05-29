@@ -1,8 +1,11 @@
+/*  File: mini_fb_style.css
+ Author: Bella WANG (bella918@bu.edu), 5/27/2025
+ Description: web css file for mini_fb assignment */
 body {
   margin: 0;
   padding: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(to right, #c9d6ff, #e2e2e2); /* 蓝色渐变 */
+  background: linear-gradient(#99e7ff, #ffffff);
   min-height: 100vh;
   color: #333;
 }
@@ -13,6 +16,7 @@ header {
   border-bottom: 2px solid #ccc;
   padding-bottom: 20px;
   text-align: center;
+  position: sticky;
 }
 
 h1 {
@@ -24,6 +28,24 @@ h2 {
   font-size: 2rem;
   color: #003366;
   margin-left: 20px;
+}
+
+h3 {
+  font-size: 1.5rem;
+  color: #5d589f;
+  text-indent: 50px;
+}
+
+h4 {
+  font-size: 1.2rem;
+  text-indent: 100px;
+  color: #1a1198;
+}
+
+h5 {
+  font-size: 1rem;
+  text-indent: 100px;
+  color: #181177;
 }
 
 table {
@@ -90,4 +112,18 @@ footer {
   font-size: 1.3rem;
   margin-top: 20px;
   color: #333;
+}
+
+.profile-action {
+  text-align: center; /* 水平居中表格内容 */
+  vertical-align: middle; /* 垂直居中表格内容 */
+  height: 100%;
+}
+
+.profile-image-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

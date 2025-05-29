@@ -1,0 +1,10 @@
+<!-- File: create_status_form.html
+ Author: Bella WANG (bella918@bu.edu), 5/27/2025
+ Description: web create_status_form html file for mini_fb assignment *-->
+{% extends 'mini_fb/base.html' %} {% block content %}
+<h2>Post a Status</h2>
+<form method="POST">
+  {% csrf_token %} {{ form.as_p }}
+  <input type="submit" value="Post" />
+</form>
+{% endblock %}

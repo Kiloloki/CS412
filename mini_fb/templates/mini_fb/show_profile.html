@@ -3,7 +3,6 @@
  Description: web show_profile html file for mini_fb assignment. generate information about one person in the profile *-->
 
 {% extends 'mini_fb/base.html' %} {% block content %}
-<nav><a href="{% url 'show_all_profiles' %}">Back to all profiles</a></nav>
 <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
 <img class="centered-img" src="{{ profile.image_url }}" width="600" />
 
@@ -12,5 +11,17 @@
   <li><strong>Email:</strong> {{ profile.email }}</li>
 </div>
 
-<a href="{% url 'show_all_profiles' %}">Back to all profiles</a>
+<h3>Status Messages</h3>
+<h4><a href="{% url 'create_status' profile.pk %}">Post a new status</a></h4>
+<ul>
+  {% for msg in profile.get_status_messages %}
+  <li>
+    <h5>
+      <strong>{{ msg.timestamp|date:"Y-m-d H:i" }}</strong>: {{ msg.message }}
+    </h5>
+  </li>
+  {% empty %}
+  <li>No messages yet. Update Now!</li>
+  {% endfor %}
+</ul>
 {% endblock %}
