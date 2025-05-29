@@ -1,11 +1,12 @@
 # File: models.py
-# Author: Bella WANG (bella918@bu.edu), 5/27/2025
+# Author: Bella WANG (bella918@bu.edu), 5/29/2025
 # Description: Model definitions for the "mini_fb" Django app.
-#              Defines the Profile model used to store user profile data.
+#              Includes the Profile and StatusMessage models.
+#              Profile stores basic user information.
+#              StatusMessage stores timestamped status updates linked to a Profile.
 from django.db import models
 from django.urls import reverse
 
-# Create your models here.
 class Profile(models.Model):
     """
     Model representing a user profile.
@@ -17,18 +18,33 @@ class Profile(models.Model):
     image_url = models.URLField()
 
     def __str__(self):
+        """
+        Returns the full name of the profile.
+        """
         return f"{self.first_name} {self.last_name}"
     
     def get_status_messages(self):
+        """
+        Returns a queryset of this profile's status messages, ordered by newest first.
+        """
         return StatusMessage.objects.filter(profile=self).order_by('-timestamp')
     
     def get_absolute_url(self):
+        """
+        Returns the absolute URL to this profile's detail page.
+        """
         return reverse('show_profile', kwargs={'pk': self.pk})
     
 class StatusMessage(models.Model):
+    """
+    Model representing a status message posted by a Profile.
+    """
     timestamp = models.DateTimeField(auto_now_add=True)
     message = models.TextField()
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
 
     def __str__(self):
+        """
+        Returns a string showing the profile's name and a preview of the message.
+        """
         return f"{self.profile.first_name} - {self.message[:30]}"

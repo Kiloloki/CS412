@@ -1,5 +1,5 @@
 #File: url.py
-#Author: Bella WANG (bella918@bu.edu), 5/27/2025
+#Author: Bella WANG (bella918@bu.edu), 5/29/2025
 #Description: URL configuration file for the "mini_fb" Django app.
 #              Maps URL paths to corresponding view functions.
 
