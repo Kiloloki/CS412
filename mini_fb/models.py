@@ -48,3 +48,24 @@ class StatusMessage(models.Model):
         Returns a string showing the profile's name and a preview of the message.
         """
         return f"{self.profile.first_name} - {self.message[:30]}"
+    
+    def get_images(self):
+        return [si.image for si in self.statusimage_set.all()]
+    
+
+class Image(models.Model):
+    profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    image_file = models.ImageField(upload_to='images/')
+    timestamp = models.DateTimeField(auto_now_add=True)
+    caption = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Image {self.id} for {self.profile}"
+
+
+class StatusImage(models.Model):
+    status_message = models.ForeignKey('StatusMessage', on_delete=models.CASCADE)
+    image = models.ForeignKey('Image', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Image {self.image.id} for Status {self.status_message.id}"

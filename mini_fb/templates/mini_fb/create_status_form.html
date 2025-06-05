@@ -3,8 +3,14 @@
  Description: web create_status_form html file for mini_fb assignment *-->
 {% extends 'mini_fb/base.html' %} {% block content %}
 <h2>Post a Status</h2>
-<form method="POST">
-  {% csrf_token %} {{ form.as_p }}
+
+<form method="POST" enctype="multipart/form-data">
+  {% csrf_token %} {{ form.as_table }}
+
+  <label for="files">Upload Image(s):</label><br />
+  <input type="file" name="files" multiple /><br /><br />
+
   <input type="submit" value="Post" />
 </form>
+
 {% endblock %}

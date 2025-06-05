@@ -9,6 +9,10 @@ from .models import Profile, StatusMessage, Profile
 from django.views.generic.edit import CreateView
 from .forms import CreateProfileForm, CreateStatusMessageForm
 from django.urls import reverse
+from .models import Image, StatusImage
+from django.views.generic.edit import UpdateView
+from .forms import UpdateProfileForm
+from django.views.generic.edit import DeleteView
 
 
 
@@ -57,14 +61,48 @@ class CreateStatusMessageView(CreateView):
         """
         Set the profile of the status message before saving the form.
         """
-        profile = Profile.objects.get(pk=self.kwargs['pk'])
-        form.instance.profile = profile
-        return super().form_valid(form)
+        sm = form.save(commit=False)  
+        sm.profile = Profile.objects.get(pk=self.kwargs['pk']) 
+        sm.save()
 
+        files = self.request.FILES.getlist('files')
+        for f in files:
+            image = Image(profile=sm.profile, image_file=f)
+            image.save()
+            si = StatusImage(status_message=sm, image=image)
+            si.save()
+
+        return super().form_valid(form)
     def get_success_url(self):
         """
         After successfully submitting the form, redirect to the profile's detail page.
         """
         return reverse('show_profile', kwargs={'pk': self.kwargs['pk']})
+    
 
 
+class UpdateProfileView(UpdateView):
+    model = Profile
+    form_class = UpdateProfileForm
+    template_name = 'mini_fb/update_profile_form.html'
+
+    def get_success_url(self):
+        return reverse('show_profile', kwargs={'pk': self.object.pk})
+    
+
+class DeleteStatusMessageView(DeleteView):
+    model = StatusMessage
+    template_name = 'mini_fb/delete_status_form.html'
+    context_object_name = 'status_message'
+
+    def get_success_url(self):
+        return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
+
+
+class UpdateStatusMessageView(UpdateView):
+    model = StatusMessage
+    fields = ['message']
+    template_name = 'mini_fb/update_status_form.html'
+
+    def get_success_url(self):
+        return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
