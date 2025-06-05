@@ -82,27 +82,45 @@ class CreateStatusMessageView(CreateView):
 
 
 class UpdateProfileView(UpdateView):
+    """
+    View to update an existing user profile.
+    """
     model = Profile
     form_class = UpdateProfileForm
     template_name = 'mini_fb/update_profile_form.html'
 
     def get_success_url(self):
+        """
+        Redirect to the updated profile's detail view.
+        """
         return reverse('show_profile', kwargs={'pk': self.object.pk})
     
 
 class DeleteStatusMessageView(DeleteView):
+    """
+    View to delete a specific status message.
+    """
     model = StatusMessage
     template_name = 'mini_fb/delete_status_form.html'
     context_object_name = 'status_message'
 
     def get_success_url(self):
+        """
+        Redirect to the profile page after deletion.
+        """
         return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
 
 
 class UpdateStatusMessageView(UpdateView):
+    """
+    View to update the content of a specific status message.
+    """
     model = StatusMessage
     fields = ['message']
     template_name = 'mini_fb/update_status_form.html'
 
     def get_success_url(self):
+        """
+        Redirect to the profile detail page after successful update.
+        """
         return reverse('show_profile', kwargs={'pk': self.object.profile.pk})

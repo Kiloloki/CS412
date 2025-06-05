@@ -50,22 +50,41 @@ class StatusMessage(models.Model):
         return f"{self.profile.first_name} - {self.message[:30]}"
     
     def get_images(self):
+        """
+        Retrieve all images associated with this status message.
+
+        Returns:
+            list: A list of Image instances linked via StatusImage.
+        """
         return [si.image for si in self.statusimage_set.all()]
     
 
 class Image(models.Model):
+    """
+    Represents an uploaded image belonging to a user profile.
+    """
+
     profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     image_file = models.ImageField(upload_to='images/')
     timestamp = models.DateTimeField(auto_now_add=True)
     caption = models.TextField(blank=True)
 
     def __str__(self):
+        """
+        Return a string identifying the image and its owner.
+        """
         return f"Image {self.id} for {self.profile}"
 
 
 class StatusImage(models.Model):
+    """
+    Intermediate model linking status messages to uploaded images.
+    """
     status_message = models.ForeignKey('StatusMessage', on_delete=models.CASCADE)
     image = models.ForeignKey('Image', on_delete=models.CASCADE)
 
     def __str__(self):
+        """
+        Return a string showing the relationship between image and status.
+        """
         return f"Image {self.image.id} for Status {self.status_message.id}"
