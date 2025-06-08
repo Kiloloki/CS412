@@ -1,0 +1,42 @@
+<!-- File: news_feed.html
+ Author: Bella WANG (bella918@bu.edu), 6/6/2025
+ Description: web news_feed html file for mini_fb assignment. *-->
+
+{% extends 'mini_fb/base.html' %} {% block content %}
+<h2>{{ profile.first_name }}'s News Feed</h2>
+
+<ul>
+  {% for msg in profile.get_news_feed %}
+  <li>
+    <img
+      src="{{ msg.profile.image_url }}"
+      width="80"
+      style="border-radius: 50%"
+    />
+    <strong>{{ msg.profile.first_name }} {{ msg.profile.last_name }}</strong
+    ><br />
+    <em>{{ msg.timestamp|date:"Y-m-d H:i" }}</em><br />
+    <p>{{ msg.message }}</p>
+
+    {% if msg.get_images %}
+    <div class="status-images">
+      {% for img in msg.get_images %}
+      <img
+        src="{{ img.image_file.url }}"
+        alt="{{ img.caption }}"
+        style="max-width: 300px; margin-top: 10px"
+      />
+      {% if img.caption %}
+      <p>{{ img.caption }}</p>
+      {% endif %} {% endfor %}
+    </div>
+    {% endif %}
+  </li>
+  <hr />
+  {% empty %}
+  <li>No updates from friends yet.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'show_profile_page' profile.pk %}">← Back to Profile</a>
+{% endblock %}

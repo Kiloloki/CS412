@@ -46,4 +46,31 @@
   {% endfor %}
 </ul>
 
+<div class="friends-section">
+  <h2>{{ profile.first_name }}'s friends</h2>
+  <div class="friends-list">
+    {% for friend in profile.get_friends %}
+    <div class="friend">
+      <a href="{% url 'show_profile_page' friend.id %}">
+        <img
+          src="{{ friend.image_url }}"
+          alt="{{ friend.first_name }} {{ friend.last_name }}"
+        />
+        <p>{{ friend.first_name }} {{ friend.last_name }}</p>
+      </a>
+    </div>
+    {% empty %}
+    <p>This user has no friends yet.</p>
+    {% endfor %}
+  </div>
+  <div style="margin-top: 20px">
+    <a href="{% url 'friend_suggestions' profile.pk %}" class="btn btn-primary">
+      View Friend Suggestions
+    </a>
+  </div>
+  <a href="{% url 'news_feed' profile.pk %}" class="btn btn-success"
+    >📰 View News Feed</a
+  >
+</div>
+
 {% endblock %}

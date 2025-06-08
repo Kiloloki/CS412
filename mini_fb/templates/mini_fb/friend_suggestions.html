@@ -1,0 +1,19 @@
+<!-- File: friend_suggestion.html
+ Author: Bella WANG (bella918@bu.edu), 6/6/2025
+ Description: web friend_suggestion html file for mini_fb assignment. *-->
+
+{% extends 'mini_fb/base.html' %} {% block content %}
+<h2>Friend Suggestions for {{ profile.first_name }}</h2>
+<ul>
+  {% for suggestion in profile.get_friend_suggestions %}
+  <li>
+    {{ suggestion.first_name }} {{ suggestion.last_name }} —
+    <a href="{% url 'add_friend' profile.pk suggestion.pk %}">Add Friend</a>
+  </li>
+  {% empty %}
+  <li>No suggestions available.</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'show_profile_page' profile.pk %}">Back to Profile</a>
+{% endblock %}

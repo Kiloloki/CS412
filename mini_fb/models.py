@@ -6,6 +6,9 @@
 #              StatusMessage stores timestamped status updates linked to a Profile.
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
+
+
 
 class Profile(models.Model):
     """
@@ -34,6 +37,51 @@ class Profile(models.Model):
         Returns the absolute URL to this profile's detail page.
         """
         return reverse('show_profile', kwargs={'pk': self.pk})
+    
+    def get_friends(self):
+        """
+        Returns the friends to this profile's detail page.
+        """
+        friendships1 = Friend.objects.filter(profile1=self)
+        friends1 = [friend.profile2 for friend in friendships1]
+
+        friendships2 = Friend.objects.filter(profile2=self)
+        friends2 = [friend.profile1 for friend in friendships2]
+
+        return friends1 + friends2
+    
+
+    def add_friend(self, other):
+        """
+        add friend with two person.
+        """
+        if self == other:
+            return
+
+        if Friend.objects.filter(profile1=self, profile2=other).exists() or \
+        Friend.objects.filter(profile1=other, profile2=self).exists():
+            return 
+
+        Friend.objects.create(profile1=self, profile2=other)
+    
+    def get_friend_suggestions(self):
+        """
+        return a list (or QuerySet) of possible friends for a Profile
+        """
+        all_profiles = Profile.objects.exclude(pk=self.pk)
+        current_friends = self.get_friends()
+        return all_profiles.exclude(pk__in=[p.pk for p in current_friends])
+    
+    def get_news_feed(self):
+        """return a list (or QuerySet) of all StatusMessages for the profile on which 
+        the method was called, as well as all of the friends of that profile.
+        """
+        from .models import StatusMessage
+        friend_profiles = self.get_friends()
+        all_profiles = friend_profiles + [self]
+
+        return StatusMessage.objects.filter(profile__in=all_profiles).order_by('-timestamp')
+
     
 class StatusMessage(models.Model):
     """
@@ -88,3 +136,23 @@ class StatusImage(models.Model):
         Return a string showing the relationship between image and status.
         """
         return f"Image {self.image.id} for Status {self.status_message.id}"
+    
+class Friend(models.Model):
+    """Friends model to see the relationship"""
+    profile1 = models.ForeignKey(
+        'Profile',
+        on_delete=models.CASCADE,
+        related_name='friendship_creator_set'
+    )
+    profile2 = models.ForeignKey(
+        'Profile',
+        on_delete=models.CASCADE,
+        related_name='friendship_receiver_set'
+    )
+    timestamp = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        """
+        Return a string showing the relationship between two people.
+        """
+        return f"{self.profile1.first_name} {self.profile1.last_name} & {self.profile2.first_name} {self.profile2.last_name}"

@@ -5,7 +5,7 @@
 #              listing all profiles, creating new profiles, and posting status messages.
 from django.shortcuts import render
 from django.views.generic import DetailView,ListView
-from .models import Profile, StatusMessage, Profile
+from .models import Profile, StatusMessage
 from django.views.generic.edit import CreateView
 from .forms import CreateProfileForm, CreateStatusMessageForm
 from django.urls import reverse
@@ -13,7 +13,8 @@ from .models import Image, StatusImage
 from django.views.generic.edit import UpdateView
 from .forms import UpdateProfileForm
 from django.views.generic.edit import DeleteView
-
+from django.views import View
+from django.shortcuts import redirect, get_object_or_404
 
 
 class ShowProfilePageView(DetailView):
@@ -124,3 +125,30 @@ class UpdateStatusMessageView(UpdateView):
         Redirect to the profile detail page after successful update.
         """
         return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
+    
+class AddFriendView(View):
+    """
+    View to add the friend.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        profile = get_object_or_404(Profile, pk=kwargs['pk'])
+        other = get_object_or_404(Profile, pk=kwargs['other_pk'])
+        profile.add_friend(other)
+        return redirect('show_profile_page', pk=profile.pk)
+    
+
+class ShowFriendSuggestionsView(DetailView):
+    """
+    Display a list of suggested friends for the given profile.
+    """
+    model = Profile
+    template_name = 'mini_fb/friend_suggestions.html'
+    context_object_name = 'profile'
+
+class ShowNewsFeedView(DetailView):
+    """
+    Display a news feed for the given profile.
+    """
+    model = Profile
+    template_name = 'mini_fb/news_feed.html'
+    context_object_name = 'profile'
