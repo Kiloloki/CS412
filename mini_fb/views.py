@@ -15,6 +15,10 @@ from .forms import UpdateProfileForm
 from django.views.generic.edit import DeleteView
 from django.views import View
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
 
 
 class ShowProfilePageView(DetailView):
@@ -40,14 +44,50 @@ class CreateProfileView(CreateView):
     model = Profile
     form_class = CreateProfileForm
     template_name = 'mini_fb/create_profile_form.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'user_form' not in context:
+            context['user_form'] = UserCreationForm()
+        return context
 
-class CreateStatusMessageView(CreateView):
+    def post(self, request, *args, **kwargs):
+        # Reconstruct both forms from POST data
+        self.object = None
+        form = self.get_form()
+        user_form = UserCreationForm(request.POST)
+
+        if form.is_valid() and user_form.is_valid():
+            # Create user
+            user = user_form.save()
+            login(self.request, user)  # log the user in
+
+            # Create profile
+            form.instance.user = user
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+        
+    def get_success_url(self):
+        return reverse('show_profile_page', kwargs={'pk': self.object.pk})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        return kwargs
+    
+
+class CreateStatusMessageView(LoginRequiredMixin, CreateView):
     """
     Create a new status for a existing person.
     """
     model = StatusMessage
     form_class = CreateStatusMessageForm
     template_name = 'mini_fb/create_status_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        if profile.user != request.user:
+            return HttpResponseForbidden("You cannot post to this profile.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
@@ -74,6 +114,7 @@ class CreateStatusMessageView(CreateView):
             si.save()
 
         return super().form_valid(form)
+    
     def get_success_url(self):
         """
         After successfully submitting the form, redirect to the profile's detail page.
@@ -82,7 +123,7 @@ class CreateStatusMessageView(CreateView):
     
 
 
-class UpdateProfileView(UpdateView):
+class UpdateProfileView(LoginRequiredMixin,UpdateView):
     """
     View to update an existing user profile.
     """
@@ -96,14 +137,26 @@ class UpdateProfileView(UpdateView):
         """
         return reverse('show_profile', kwargs={'pk': self.object.pk})
     
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.user != request.user:
+            return HttpResponseForbidden("You are not allowed to edit this profile.")
+        return super().dispatch(request, *args, **kwargs)
+    
 
-class DeleteStatusMessageView(DeleteView):
+class DeleteStatusMessageView(LoginRequiredMixin, DeleteView):
     """
     View to delete a specific status message.
     """
     model = StatusMessage
     template_name = 'mini_fb/delete_status_form.html'
     context_object_name = 'status_message'
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.profile.user != request.user:
+            return HttpResponseForbidden("You cannot delete this.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         """
@@ -112,7 +165,7 @@ class DeleteStatusMessageView(DeleteView):
         return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
 
 
-class UpdateStatusMessageView(UpdateView):
+class UpdateStatusMessageView(LoginRequiredMixin, UpdateView):
     """
     View to update the content of a specific status message.
     """
@@ -120,24 +173,34 @@ class UpdateStatusMessageView(UpdateView):
     fields = ['message']
     template_name = 'mini_fb/update_status_form.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.profile.user != request.user:
+            return HttpResponseForbidden("You cannot edit this message.")
+        return super().dispatch(request, *args, **kwargs)
+    
+
     def get_success_url(self):
         """
         Redirect to the profile detail page after successful update.
         """
         return reverse('show_profile', kwargs={'pk': self.object.profile.pk})
     
-class AddFriendView(View):
+class AddFriendView(LoginRequiredMixin,View):
     """
     View to add the friend.
     """
+
     def dispatch(self, request, *args, **kwargs):
         profile = get_object_or_404(Profile, pk=kwargs['pk'])
+        if profile.user != request.user:
+            return HttpResponseForbidden("You cannot add friends to someone else's profile.")
         other = get_object_or_404(Profile, pk=kwargs['other_pk'])
         profile.add_friend(other)
         return redirect('show_profile_page', pk=profile.pk)
     
 
-class ShowFriendSuggestionsView(DetailView):
+class ShowFriendSuggestionsView(LoginRequiredMixin, DetailView):
     """
     Display a list of suggested friends for the given profile.
     """
@@ -145,10 +208,23 @@ class ShowFriendSuggestionsView(DetailView):
     template_name = 'mini_fb/friend_suggestions.html'
     context_object_name = 'profile'
 
-class ShowNewsFeedView(DetailView):
+    def dispatch(self, request, *args, **kwargs):
+        profile = self.get_object()
+        if profile.user != request.user:
+            return HttpResponseForbidden("You cannot view someone else's friend suggestions.")
+        return super().dispatch(request, *args, **kwargs)
+
+class ShowNewsFeedView(LoginRequiredMixin, DetailView):
     """
     Display a news feed for the given profile.
     """
     model = Profile
     template_name = 'mini_fb/news_feed.html'
     context_object_name = 'profile'
+
+
+    def dispatch(self, request, *args, **kwargs):
+        profile = self.get_object()
+        if profile.user != request.user:
+            return HttpResponseForbidden("You cannot view someone else's news feed.")
+        return super().dispatch(request, *args, **kwargs)

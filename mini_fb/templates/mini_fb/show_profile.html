@@ -3,6 +3,7 @@
  Description: web show_profile html file for mini_fb assignment. generate information about one person in the profile *-->
 
 {% extends 'mini_fb/base.html' %} {% block content %}
+
 <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
 <img class="centered-img" src="{{ profile.image_url }}" width="600" />
 
@@ -12,19 +13,24 @@
 </div>
 
 <h3>Status Messages</h3>
+
+{% if user.is_authenticated and user == profile.user %}
 <h4>
   <a href="{% url 'create_status' profile.pk %}">Post a new status</a> |
   <a href="{% url 'update_profile' profile.pk %}">Update Profile</a>
 </h4>
+{% endif %}
 
 <ul>
   {% for msg in profile.get_status_messages %}
   <li>
     <h5>
       <strong>{{ msg.timestamp|date:"Y-m-d H:i" }}</strong>: {{ msg.message }}
+      {% if user.is_authenticated and user == profile.user %}
       <br />
       <a href="{% url 'update_status' msg.pk %}">Update</a> |
       <a href="{% url 'delete_status' msg.pk %}">Delete</a>
+      {% endif %}
     </h5>
 
     {% if msg.get_images %}
@@ -42,7 +48,7 @@
     {% endif %}
   </li>
   {% empty %}
-  <li><h5>No messages yet. Update Now!</h5></li>
+  <li><h5>No messages yet.</h5></li>
   {% endfor %}
 </ul>
 
@@ -63,14 +69,17 @@
     <p>This user has no friends yet.</p>
     {% endfor %}
   </div>
+
+  {% if user.is_authenticated and user == profile.user %}
   <div style="margin-top: 20px">
     <a href="{% url 'friend_suggestions' profile.pk %}" class="btn btn-primary">
       View Friend Suggestions
     </a>
   </div>
-  <a href="{% url 'news_feed' profile.pk %}" class="btn btn-success"
-    >📰 View News Feed</a
-  >
+  <a href="{% url 'news_feed' profile.pk %}" class="btn btn-success">
+    📰 View News Feed
+  </a>
+  {% endif %}
 </div>
 
 {% endblock %}

@@ -144,3 +144,4 @@ if socket.gethostname() == CS_DEPLOYMENT_HOSTNAME:
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/mini_fb/login/'

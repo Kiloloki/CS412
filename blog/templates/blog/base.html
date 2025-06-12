@@ -1,22 +1,43 @@
-<!-- templates/base.html -->
-<!-- blog/templates/blog/base.html -->
+<!-- templates/blog/base.html -->
 {% load static %}
-<html>
-  <head>
-    <title>Blog</title>
-    <link rel="stylesheet" href="{% static 'blog.css' %}" />
-  </head>
-  <body>
-    <header>
-      <h1>Blog</h1>
-      <nav>
-        <ul>
-          <li><a href="{% url 'show_all_blogs' %}">Show All</a></li>
-          <li><a href="{% url 'random' %}">Random</a></li>
-        </ul>
-      </nav>
-    </header>
 
-    {% block content %} {% endblock %}
-  </body>
+<html>
+    <head>
+        <title>Our Blog</title>
+        <link rel="stylesheet" href="{% static 'styles-blog.css' %}">
+    </head>
+
+    <body>
+        <head>
+            <h1>Our Blog</h1>
+            <nav>
+                <ul>
+					<!-- URLs for users who are not logged in -->
+                    <li><a href="{% url 'random' %}">Random</a></li>
+                    <li><a href="{% url 'show_all' %}">Show All</a></li>
+
+                    <!-- URLs for logged in users only -->
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'create_article' %}">Create</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+
+                    <!-- URLs for users who are not logged in -->
+                    {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
+                </ul>
+                <hr>
+                {% if request.user.is_authenticated %}
+                Logged in as: {{request.user}}
+                {% else %}
+                Not logged in.
+                {% endif %}
+            </nav>
+        </head>
+
+        <!-- substitute in the specific content here -->
+        {% block content %}
+        {% endblock %}
+
+    </body>
 </html>

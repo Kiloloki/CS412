@@ -1,0 +1,33 @@
+<!-- blog/show_all.html --> 
+{% extends 'blog/base.html' %} 
+
+{% block content %}
+<h1>Showing all articles</h1> 
+<!-- this displays the QuerySet of all articles. -->
+<!-- {{articles}} --> 
+
+<main class="grid-container"> 
+    <!-- scriptlet code for a for loop --> 
+    {% for article in articles %} 
+    <article> 
+        <div>
+            <h2> {{article.title}} </h2> 
+            <h3> by {{article.author}} </h3>            
+            <p> 
+                {{article.text}} 
+            </p> 
+        </div> 
+        <a href="{% url 'article' article.pk %}"> 
+        {% if article.image_file %}
+        <img src="{{article.image_file.url}}" alt=""> 
+        {% else %} 
+        <h3> No image </h3> 
+        {% endif %}
+        </a> 
+        
+    </article> 
+    <hr>
+
+    {% endfor %} 
+</main> 
+{% endblock %}

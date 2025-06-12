@@ -2,10 +2,21 @@
  Author: Bella WANG (bella918@bu.edu), 5/27/2025
  Description: web create_profile_form html file for mini_fb assignment *-->
 
-{% extends 'mini_fb/base.html' %} {% block content %}
-<h2>Create New Profile</h2>
-<form method="POST">
-  {% csrf_token %} {{ form.as_table }}
-  <input type="submit" value="Create Profile" />
-</form>
+{% extends 'mini_fb/base.html' %}
+
+{% block content %}
+  <h2>Create Account and Profile</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- User Creation Form -->
+    <h3>Account Information</h3>
+    {{ user_form.as_p }}
+
+    <!-- Profile Form -->
+    <h3>Profile Information</h3>
+    {{ form.as_p }}
+
+    <button type="submit">Submit</button>
+  </form>
 {% endblock %}
