@@ -45,6 +45,10 @@ class CreateProfileView(CreateView):
     form_class = CreateProfileForm
     template_name = 'mini_fb/create_profile_form.html'
     def get_context_data(self, **kwargs):
+        """
+        Inject the UserCreationForm into the template context 
+        so the user can create a Django account.
+        """
         context = super().get_context_data(**kwargs)
         if 'user_form' not in context:
             context['user_form'] = UserCreationForm()
@@ -59,7 +63,7 @@ class CreateProfileView(CreateView):
         if form.is_valid() and user_form.is_valid():
             # Create user
             user = user_form.save()
-            login(self.request, user)  # log the user in
+            login(self.request, user)
 
             # Create profile
             form.instance.user = user
@@ -68,6 +72,9 @@ class CreateProfileView(CreateView):
             return self.form_invalid(form)
         
     def get_success_url(self):
+        """
+        Redirect to the newly created profile page after success.
+        """
         return reverse('show_profile_page', kwargs={'pk': self.object.pk})
 
     def get_form_kwargs(self):
@@ -84,6 +91,9 @@ class CreateStatusMessageView(LoginRequiredMixin, CreateView):
     template_name = 'mini_fb/create_status_form.html'
 
     def dispatch(self, request, *args, **kwargs):
+        """
+        Prevent posting to other users' profiles.
+        """
         profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
         if profile.user != request.user:
             return HttpResponseForbidden("You cannot post to this profile.")
@@ -138,6 +148,9 @@ class UpdateProfileView(LoginRequiredMixin,UpdateView):
         return reverse('show_profile', kwargs={'pk': self.object.pk})
     
     def dispatch(self, request, *args, **kwargs):
+        """
+        Prevent users from updating other users' profiles.
+        """
         obj = self.get_object()
         if obj.user != request.user:
             return HttpResponseForbidden("You are not allowed to edit this profile.")
@@ -153,6 +166,9 @@ class DeleteStatusMessageView(LoginRequiredMixin, DeleteView):
     context_object_name = 'status_message'
 
     def dispatch(self, request, *args, **kwargs):
+        """
+        Prevent users from deleting messages that aren't theirs.
+        """
         obj = self.get_object()
         if obj.profile.user != request.user:
             return HttpResponseForbidden("You cannot delete this.")
@@ -174,6 +190,9 @@ class UpdateStatusMessageView(LoginRequiredMixin, UpdateView):
     template_name = 'mini_fb/update_status_form.html'
 
     def dispatch(self, request, *args, **kwargs):
+        """
+        Prevent users from editing messages that aren't theirs.
+        """
         obj = self.get_object()
         if obj.profile.user != request.user:
             return HttpResponseForbidden("You cannot edit this message.")
@@ -224,6 +243,9 @@ class ShowNewsFeedView(LoginRequiredMixin, DetailView):
 
 
     def dispatch(self, request, *args, **kwargs):
+        """
+        Prevent users from viewing other users' news feeds.
+        """
         profile = self.get_object()
         if profile.user != request.user:
             return HttpResponseForbidden("You cannot view someone else's news feed.")
