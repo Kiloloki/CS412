@@ -1,0 +1,57 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voter Records</title>
+  <link rel="stylesheet" href="{% static 'voter_styles.css' %}">
+</head>
+<body>
+
+  <h1>Voter Records</h1>
+
+  <form method="get">
+    <label>Party:</label>
+    {{ form.party_affiliation }}<br>
+
+    <label>Min Birth Year:</label>
+    {{ form.min_birth_year }}<br>
+
+    <label>Max Birth Year:</label>
+    {{ form.max_birth_year }}<br>
+
+    <label>Voter Score:</label>
+    {{ form.voter_score }}<br>
+
+    <label>{{ form.v20state }} 2020 State</label><br>
+    <label>{{ form.v21town }} 2021 Town</label><br>
+    <label>{{ form.v21primary }} 2021 Primary</label><br>
+    <label>{{ form.v22general }} 2022 General</label><br>
+    <label>{{ form.v23town }} 2023 Town</label><br>
+
+    <button type="submit">🔍 Filter</button>
+  </form>
+
+  <ul>
+    {% for voter in voters %}
+    <li>
+      {{ voter.first_name }} {{ voter.last_name }} - {{ voter.party_affiliation }} - Score: {{ voter.voter_score }}
+      <a href="{% url 'voter' voter.pk %}">Details</a>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="pagination">
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">« Previous</a>
+      {% endif %}
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">Next »</a>
+      {% endif %}
+    {% endif %}
+  </div>
+
+</body>
+</html>

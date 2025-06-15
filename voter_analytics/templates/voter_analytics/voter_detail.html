@@ -1,0 +1,46 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voter Detail - {{ object.first_name }} {{ object.last_name }}</title>
+  <link rel="stylesheet" href="{% static 'voter_styles.css' %}">
+</head>
+<body>
+
+  <h1>Voter: {{ object.first_name }} {{ object.last_name }}</h1>
+
+  <p><strong>Date of Birth:</strong> {{ object.date_of_birth|date:"M. j, Y" }}</p>
+  <p><strong>Date of Registration:</strong> {{ object.date_of_registration|date:"M. j, Y" }}</p>
+  <p><strong>Party Affiliation:</strong> {{ object.party_affiliation }}</p>
+  <p><strong>Precinct:</strong> {{ object.precinct_number }}</p>
+  <p><strong>Voter Score:</strong> {{ object.voter_score }}</p>
+
+  <h3>Voting History</h3>
+  <p><strong>2020 State:</strong> {{ object.v20state }}</p>
+  <p><strong>2021 Town:</strong> {{ object.v21town }}</p>
+  <p><strong>2021 Primary:</strong> {{ object.v21primary }}</p>
+  <p><strong>2022 General:</strong> {{ object.v22general }}</p>
+  <p><strong>2023 Town:</strong> {{ object.v23town }}</p>
+
+  <h3>Address</h3>
+  {% if object.street_number and object.street_name %}
+    <p>
+      {{ object.street_number }} {{ object.street_name }}
+      {% if object.apartment_number %}
+        , Apt {{ object.apartment_number }}
+      {% endif %}
+      ({{ object.zip_code }})
+    </p>
+    <p>
+      <a href="https://www.google.com/maps/search/?api=1&query={{ object.street_number }}+{{ object.street_name|urlencode }}+{{ object.zip_code }}"
+         target="_blank">📍 View on Google Maps</a>
+    </p>
+  {% else %}
+    <p><em>Address not available.</em></p>
+  {% endif %}
+
+  <p><a href="{% url 'voters' %}">← Back to voter list</a></p>
+
+</body>
+</html>

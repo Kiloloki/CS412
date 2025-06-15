@@ -28,6 +28,7 @@ urlpatterns = [
     path('restaurant/', include('restaurant.urls')),
     path('blog/', include('blog.urls')), 
     path('mini_fb/', include('mini_fb.urls')),
+    path('voters/', include('voter_analytics.urls')),
     
 ]
 

@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voter Graphs</title>
+  <link rel="stylesheet" href="{% static 'voter_styles.css' %}">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+
+<h1>📊 Voter Data Visualizations</h1>
+
+<form method="get">
+  <label>Party:</label> {{ form.party_affiliation }}<br>
+  <label>Min Birth Year:</label> {{ form.min_birth_year }}<br>
+  <label>Max Birth Year:</label> {{ form.max_birth_year }}<br>
+  <label>Voter Score:</label> {{ form.voter_score }}<br>
+
+  <label>{{ form.v20state }} 2020 State</label><br>
+  <label>{{ form.v21town }} 2021 Town</label><br>
+  <label>{{ form.v21primary }} 2021 Primary</label><br>
+  <label>{{ form.v22general }} 2022 General</label><br>
+  <label>{{ form.v23town }} 2023 Town</label><br>
+
+  <button type="submit">Filter</button>
+</form>
+
+<hr>
+
+<h2>1. Voter Birth Year Distribution</h2>
+{{ birth_hist|safe }}
+
+<h2>2. Party Affiliation</h2>
+{{ party_pie|safe }}
+
+<h2>3. Vote Count by Election</h2>
+{{ election_bar|safe }}
+
+<p><a href="{% url 'voters' %}">← Back to voter list</a></p>
+
+</body>
+</html>
