@@ -1,3 +1,11 @@
+# File: models.py
+# Author: bella918@bu.edu
+# Date: 6/16/2025
+# Description: Defines the Voter model for the voter_analytics Django app,
+#              and provides a utility function to load Voter records from
+#              a local CSV file.
+
+
 from django.db import models
 
 class Voter(models.Model):

@@ -1,3 +1,10 @@
+# File: views.py
+# Author: bella918@bu.edu
+# Date: 6/14/2025
+# Description: View definitions for the voter_analytics Django application.
+#              Includes views for listing and filtering voter records,
+#              showing detailed voter information, and generating data visualizations.
+
 from django.views.generic import ListView, DetailView, TemplateView
 from .models import Voter
 from .forms import VoterFilterForm
@@ -7,12 +14,19 @@ import plotly.graph_objects as go
 from plotly.offline import plot
 
 class VoterListView(ListView):
+    """
+    Displays a paginated list of voter records with optional filtering
+    via GET parameters using the VoterFilterForm.
+    """
     model = Voter
     template_name = 'voter_analytics/voter_list.html'
     context_object_name = 'voters'
     paginate_by = 100
 
     def get_queryset(self):
+        """
+        Apply filters from the VoterFilterForm to the voter queryset.
+        """
         queryset = Voter.objects.all()
         form = VoterFilterForm(self.request.GET)
         if form.is_valid():
@@ -38,19 +52,29 @@ class VoterListView(ListView):
         return queryset
 
     def get_context_data(self, **kwargs):
+        """
+        Add the filter form to the context so it can be displayed in the template.
+        """
         context = super().get_context_data(**kwargs)
         context['form'] = VoterFilterForm(self.request.GET)
         return context
 
 class VoterDetailView(DetailView):
+    """
+    Displays detailed information for a single voter record.
+    """
     model = Voter
     template_name = 'voter_analytics/voter_detail.html'
 
 
 class VoterGraphsView(TemplateView):
+    """Displays interactive graphs based on the filtered voter dataset."""
     template_name = 'voter_analytics/graphs.html'
 
     def get_queryset(self):
+        """
+        Apply filters to the queryset based on GET parameters using the VoterFilterForm.
+        """
         queryset = Voter.objects.all()
         form = VoterFilterForm(self.request.GET)
         if form.is_valid():
@@ -70,6 +94,9 @@ class VoterGraphsView(TemplateView):
         return queryset
 
     def get_context_data(self, **kwargs):
+        """
+        Generate visualizations based on the filtered queryset and add them to the context.
+        """
         context = super().get_context_data(**kwargs)
         queryset = self.get_queryset()
         context['form'] = VoterFilterForm(self.request.GET)
