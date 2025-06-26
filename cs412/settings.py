@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     "hw", # new app for pre class 1
     'quotes', # new app for assignment 1
     "formdata", # new app for pre class 2
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     "mini_fb", # new app for assignment 3
     "marathon_analytics",
     'voter_analytics', # new app for assignment 8
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -127,15 +129,42 @@ USE_TZ = True
 
 
 
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
+STATIC_URL = 'static/'
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+INSTALLED_APPS += ['corsheaders']
+MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+
+
+
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = 'static/' # note: no leading slash!
+
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-MEDIA_URL= "media/"  # note: no leading slash!
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+# MEDIA_URL= "media/"  # note: no leading slash!
 
 import socket
 CS_DEPLOYMENT_HOSTNAME = 'cs-webapps.bu.edu'
@@ -145,5 +174,4 @@ if socket.gethostname() == CS_DEPLOYMENT_HOSTNAME:
     MEDIA_URL = '/bella918/media/'
 
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = '/mini_fb/login/'
+# LOGIN_URL = '/mini_fb/login/'

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Remove Background Tool</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a90e2, #8e44ad);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            font-family: "Roboto", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .page-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 100px;
+        }
+
+        .section {
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 500px;
+            min-width: 500px;
+            width: 80%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .section:hover {
+            transform: scale(1.02);
+        }
+
+        .preview-img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .crop-input {
+            width: 100px;
+            margin: 5px 10px;
+        }
+
+        .mdl-textfield {
+            width: 80%;
+            max-width: 300px;
+            margin: 0 auto 20px auto;
+        }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+
+        /* Progress Bar */
+        #progress-bar-container {
+            display: none;
+            width: 100%;
+            background-color: #ddd;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <!-- Header -->
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Remove Background Tool</span>
+            <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="{% url 'history' %}">View History</a>
+                <a class="mdl-navigation__link" href="{% url 'search' %}">Search</a>
+                {% if user.is_authenticated %}
+                <span class="mdl-navigation__link">Welcome, {{ user.username }}</span>
+                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline">
+                    {% csrf_token %}
+                    <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" style="margin-left: 10px">Logout</button>
+                </form>
+                {% else %}
+                <a class="mdl-navigation__link" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="mdl-layout__content">
+        <div class="page-container">
+            <div class="page-content">
+
+                <!-- Search Section -->
+                <div class="section">
+                    <h4>🔍 Search by Tag</h4>
+                    <div class="mdl-textfield mdl-js-textfield">
+                        <input class="mdl-textfield__input" type="text" id="search-tag" placeholder="Enter Tag" />
+                    </div>
+                    <br />
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="searchByTag()">Search</button>
+                </div>
+
+                <!-- Upload Section -->
+                <div class="section">
+                    <h4>📤 Upload Image</h4>
+                    <input type="file" id="fileElem" accept="image/*" hidden onchange="handleFiles(this.files)" />
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="checkAuthAndUpload()">Select Image</button>
+                    <div id="upload-status" class="success-message"></div>
+                </div>
+
+                <!-- Preview Section -->
+                <div class="section" id="preview-section" style="display: none">
+                    <h4>📸 Uploaded Image</h4>
+                    <img id="uploaded-image" class="preview-img" />
+                    <br /><br />
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="processImage()">Process Full Image</button>
+                </div>
+
+                <!-- Progress Bar -->
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+
+                <!-- Crop Section -->
+                <div class="section" id="crop-section" style="display: none">
+                    <h4>✂️ Crop Image</h4>
+                    <div style="max-width: 400px; margin: 0 auto">
+                        <img id="cropper-image" class="preview-img" />
+                    </div>
+                    <br />
+                    <input type="number" id="crop-x" class="crop-input" placeholder="X" />
+                    <input type="number" id="crop-y" class="crop-input" placeholder="Y" />
+                    <input type="number" id="crop-width" class="crop-input" placeholder="Width" />
+                    <input type="number" id="crop-height" class="crop-input" placeholder="Height" />
+                    <br /><br />
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" onclick="processCrop()">Process Crop</button>
+                </div>
+
+                <!-- Tag Section -->
+                <div class="section" id="tag-section" style="display: none">
+                    <h4>🏷️ Add Tag</h4>
+                    <div class="mdl-textfield mdl-js-textfield">
+                        <input class="mdl-textfield__input" type="text" id="tag-input" placeholder="Enter Tag" />
+                    </div>
+                    <br />
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="addTag()">Add Tag</button>
+                </div>
+
+                <!-- Result Section -->
+                <div class="section" id="result-section"></div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    let uploadedImageId = null;
+    let cropper = null;
+
+    function getCSRFToken() {
+        return "{{ csrf_token }}";
+    }
+
+    function checkAuthAndUpload() {
+        {% if user.is_authenticated %}
+        document.getElementById("fileElem").click();
+        {% else %}
+        window.location.href = "{% url 'login' %}?next=/";
+        {% endif %}
+    }
+
+    function handleFiles(files) {
+        const file = files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/upload/");
+        xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+
+        xhr.onload = function () {
+            if (xhr.status === 201) {
+                const data = JSON.parse(xhr.responseText);
+                uploadedImageId = data.id;
+
+                document.getElementById("uploaded-image").src = data.image;
+                document.getElementById("preview-section").style.display = "block";
+
+                document.getElementById("cropper-image").src = data.image;
+                document.getElementById("crop-section").style.display = "block";
+                document.getElementById("tag-section").style.display = "block";
+
+                if (cropper) {
+                    cropper.destroy();
+                }
+                let cropperImage = document.getElementById("cropper-image");
+                cropper = new Cropper(cropperImage, {
+                    viewMode: 1,
+                    movable: true,
+                    zoomable: true,
+                    scalable: true,
+                    crop(event) {
+                        document.getElementById("crop-x").value = Math.round(event.detail.x);
+                        document.getElementById("crop-y").value = Math.round(event.detail.y);
+                        document.getElementById("crop-width").value = Math.round(event.detail.width);
+                        document.getElementById("crop-height").value = Math.round(event.detail.height);
+                    }
+                });
+
+                document.getElementById("upload-status").innerHTML = '✅ Upload successful!';
+            } else {
+                alert("Upload failed.");
+            }
+        };
+
+        xhr.send(formData);
+    }
+
+    function simulateProgressBar() {
+        let progressBarContainer = document.getElementById("progress-bar-container");
+        let progressBar = document.getElementById("progress-bar");
+        progressBarContainer.style.display = "block";
+        progressBar.style.width = "0%";
+
+        let width = 0;
+        let interval = setInterval(function () {
+            if (width >= 100) {
+                clearInterval(interval);
+            } else {
+                width += 1;
+                progressBar.style.width = width + "%";
+            }
+        }, 30);
+    }
+
+    function processImage() {
+        if (!uploadedImageId) return;
+
+        simulateProgressBar();
+
+        fetch("/api/full_process/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ image_id: uploadedImageId })
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("result-section").innerHTML = `
+                    <h4>✅ Processed Image</h4>
+                    <img src="${data.processed_url}" class="preview-img"><br><br>
+                    <a href="${data.processed_url}" download class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Download</a>
+                `;
+            });
+    }
+
+    function processCrop() {
+        if (!uploadedImageId) return;
+
+        const x = parseFloat(document.getElementById("crop-x").value);
+        const y = parseFloat(document.getElementById("crop-y").value);
+        const width = parseFloat(document.getElementById("crop-width").value);
+        const height = parseFloat(document.getElementById("crop-height").value);
+
+        fetch("/api/crop_process/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ image_id: uploadedImageId, x: x, y: y, width: width, height: height })
+        })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("result-section").innerHTML = `
+                    <h4>✅ Cropped Image</h4>
+                    <img src="${data.processed_url}" class="preview-img"><br><br>
+                    <a href="${data.processed_url}" download class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Download</a>
+                `;
+            });
+    }
+
+    function addTag() {
+        if (!uploadedImageId) return;
+
+        const tag = document.getElementById("tag-input").value.trim();
+        if (tag === "") {
+            alert("Tag cannot be empty.");
+            return;
+        }
+
+        fetch("/api/add_tag/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": getCSRFToken() },
+            body: JSON.stringify({ image_id: uploadedImageId, tag: tag })
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert(`Tag "${data.tag}" added successfully!`);
+                document.getElementById("tag-input").value = "";
+            });
+    }
+
+    function searchByTag() {
+        const tag = document.getElementById("search-tag").value.trim();
+        if (tag === "") {
+            alert("Tag cannot be empty.");
+            return;
+        }
+        window.location.href = `/search/?tag=${encodeURIComponent(tag)}`;
+    }
+</script>
+</body>
+</html>

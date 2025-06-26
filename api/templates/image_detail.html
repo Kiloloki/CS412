@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Detail</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a90e2, #8e44ad);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .page-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 100px;
+        }
+        .detail-card {
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .detail-card:hover {
+            transform: scale(1.02);
+        }
+        .preview-img {
+            max-width: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .mdl-button:hover {
+            transform: scale(1.05);
+            transition: 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">Image Detail</span>
+            <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="{% url 'home' %}">Home</a>
+                <a class="mdl-navigation__link" href="{% url 'history' %}">History</a>
+                <a class="mdl-navigation__link" href="{% url 'search' %}">Search</a>
+                {% if user.is_authenticated %}
+                    <span class="mdl-navigation__link">Welcome, {{ user.username }}</span>
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" style="margin-left: 10px;">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="mdl-navigation__link" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="mdl-layout__content">
+        <div class="page-container">
+            <div class="detail-card">
+                <h4>Original Image</h4>
+                <img src="{{ image.image }}" alt="Original Image" class="preview-img">
+
+                {% if image.processed_image %}
+                <h4>Processed Image</h4>
+                <img src="{{ image.processed_image }}" alt="Processed Image" class="preview-img">
+                <br><br>
+                <a href="{{ image.processed_image }}" download class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Download Processed Image</a>
+                {% endif %}
+
+                <div style="margin-top: 30px;">
+                    <h5>Tags:</h5>
+                    {% if image.tags %}
+                        {% for tag in image.tags %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <p>No tags for this image.</p>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h5>Processing Method: {{ image.method|title }}</h5>
+                    {% if image.method == 'crop' %}
+                        <p><strong>Crop Parameters:</strong></p>
+                        <p>X: {{ image.crop_params.x }}</p>
+                        <p>Y: {{ image.crop_params.y }}</p>
+                        <p>Width: {{ image.crop_params.width }}</p>
+                        <p>Height: {{ image.crop_params.height }}</p>
+                    {% endif %}
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button class="mdl-button mdl-js-button mdl-button--raised" onclick="window.history.back();">Back to Previous Page</button>
+                    <a href="{% url 'history' %}" class="mdl-button mdl-js-button mdl-button--raised" style="margin-left: 10px;">Back to History</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

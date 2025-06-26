@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>History</title>
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4a90e2, #8e44ad);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .page-container {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 100px;
+        }
+        .section {
+            margin: 40px auto;
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+        .section:hover {
+            transform: scale(1.02);
+        }
+        .preview-img {
+            max-width: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .tag {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .pagination {
+            text-align: center;
+            margin: 20px 0;
+            font-weight: bold;
+            color: white;
+        }
+        .pagination a {
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">History</span>
+            <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="{% url 'home' %}">Home</a>
+                <a class="mdl-navigation__link" href="{% url 'search' %}">Search</a>
+                {% if user.is_authenticated %}
+                    <span class="mdl-navigation__link">Welcome, {{ user.username }}</span>
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" style="margin-left: 10px;">Logout</button>
+                    </form>
+                {% else %}
+                    <a class="mdl-navigation__link" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="mdl-layout__content">
+        <div class="page-container">
+            <div class="page-content">
+                {% for image in images %}
+                    <div class="section">
+                        <h4>Original Image</h4>
+                        <img src="{{ image.image_url }}" alt="Original Image" class="preview-img">
+
+                        {% if image.processed_image_url %}
+                            <h4>Processed Image</h4>
+                            <img src="{{ image.processed_image_url }}" alt="Processed Image" class="preview-img">
+                            <br><br>
+
+                            {% if user.is_authenticated %}
+                                <a href="{{ image.processed_image_url }}" download class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+                                    Download Processed
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        <br><br>
+
+                        {% if image.processed_image_url and user.is_authenticated %}
+                            <a href="{% url 'image_detail' image.id %}" class="mdl-button mdl-js-button mdl-button--raised">
+                                View Detail
+                            </a>
+                        {% endif %}
+
+                        {% if user.is_authenticated and user.username == image.username %}
+                            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" onclick="deleteImage({{ image.id }})">
+                                Delete
+                            </button>
+                        {% endif %}
+
+                        <h5 style="margin-top: 20px;">Tags:</h5>
+                        {% if image.tags %}
+                            {% for tag in image.tags %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <p>No tags</p>
+                        {% endif %}
+
+                        {% if user.is_authenticated and user.username == image.username %}
+                            <div>
+                                <input type="text" id="tag-input-{{ image.id }}" class="tag-input" placeholder="Enter new tag">
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored"
+                                        onclick="updateTag({{ image.id }})" style="margin-left: 5px;">
+                                    Update Tag
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}">Previous</a>
+                    {% endif %}
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if current_tag %}&tag={{ current_tag }}{% endif %}">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function deleteImage(imageId) {
+        if (!confirm('Are you sure you want to delete this image?')) return;
+
+        fetch("/api/delete_image/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ image_id: imageId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'deleted') {
+                location.reload();
+            } else {
+                alert('Delete failed.');
+            }
+        });
+    }
+
+    function updateTag(imageId) {
+        const tagInput = document.getElementById(`tag-input-${imageId}`).value.trim();
+        if (tagInput === '') {
+            alert('Tag cannot be empty.');
+            return;
+        }
+
+        fetch(`/update_tag/${imageId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ tag: tagInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Tag updated successfully!');
+                location.reload();
+            } else {
+                alert('Failed to update tag.');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
