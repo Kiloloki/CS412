@@ -1,5 +1,5 @@
 """
-models.py
+api/models.py
 
 This module defines the database schema for the image processing application.
 It includes models for uploaded images, cropping regions, processing logs, 

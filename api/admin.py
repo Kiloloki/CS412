@@ -1,3 +1,9 @@
+"""
+Author: bella918@bu.edu
+Project: api/admin.py
+Description: Django admin configuration for image processing application.
+Date: 2025-06-26
+"""
 from django.contrib import admin
 
 # Register your models here.

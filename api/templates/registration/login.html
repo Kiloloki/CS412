@@ -1,3 +1,10 @@
+<!--
+    Author: bella918@bu.edu
+    Project: api/login.html
+    Description: A styled login page with Material Design Lite and header navigation.
+    Date: 2025-06-26
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,19 +38,46 @@
         .mdl-textfield {
             width: 100%;
         }
+        .mdl-layout__header {
+            background-color: #3f51b5;
+        }
+        .mdl-layout__header-row .mdl-navigation__link {
+            color: white;
+        }
     </style>
 </head>
 
 <body>
-<div class="login-card">
-    <h4>Login</h4>
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Login</button>
-    </form>
-    <br>
-    <a href="{% url 'register' %}">Don't have an account? Register</a>
+<!-- Header Navigation -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">My Application</span>
+            <div class="mdl-layout-spacer"></div>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="{% url 'home' %}">Home</a>
+                <a class="mdl-navigation__link" href="{% url 'register' %}">Register</a>
+                <a class="mdl-navigation__link" href="{% url 'login' %}">Login</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="mdl-layout__content">
+        <div class="page-content" style="display: flex; justify-content: center; align-items: center; min-height: 90vh;">
+            <div class="login-card">
+                <h4>Login</h4>
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">Login</button>
+                </form>
+                <br>
+                <a href="{% url 'register' %}">Don't have an account? Register</a>
+            </div>
+        </div>
+    </main>
 </div>
+
 </body>
 </html>
